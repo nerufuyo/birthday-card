@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { motion } from 'framer-motion'
 
 type MusicToggleProps = {
   src: string
@@ -111,17 +110,14 @@ export function MusicToggle({ src, label, helperText, autoStartToken = 0 }: Musi
 
   return (
     <div className="fixed bottom-4 right-4 z-30 flex max-w-[15rem] flex-col items-end gap-1">
-      <motion.button
+      <button
         onClick={() => {
           void togglePlayback()
         }}
-        whileTap={{ scale: 0.96 }}
-        animate={isPlaying ? { boxShadow: '0 0 0 0 rgba(183,201,168,0.55)' } : { boxShadow: ['0 0 0 0 rgba(183,201,168,0.45)', '0 0 0 10px rgba(183,201,168,0)', '0 0 0 0 rgba(183,201,168,0)'] }}
-        transition={{ duration: 2.2, repeat: Number.POSITIVE_INFINITY, ease: 'easeOut' }}
-        className="rounded-full border-2 border-[#d7c8b8] bg-white/95 px-4 py-2 text-sm font-semibold text-[#5b4b45] shadow-[0_8px_20px_-14px_rgba(91,75,69,0.8)] backdrop-blur"
+        className="rounded-full border-2 border-[#d7c8b8] bg-white/95 px-4 py-2 text-sm font-semibold text-[#5b4b45] shadow-[0_8px_20px_-14px_rgba(91,75,69,0.8)] backdrop-blur transition-transform active:scale-95"
       >
         {isPlaying ? '⏸ ' : '▶ '} {buttonLabel}
-      </motion.button>
+      </button>
       {!errorText && helperText && !isPlaying && <p className="rounded-full bg-white/85 px-3 py-1 text-xs text-[#7b665f]">{helperText}</p>}
       {errorText && <p className="rounded-xl bg-white/95 px-3 py-2 text-xs text-[#8b5f58] shadow-sm">{errorText}</p>}
     </div>

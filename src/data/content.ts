@@ -25,6 +25,6 @@ export const content = {
   ending: {
     title: 'happy birthday, my love 🌸',
     message: 'I hope this made you feel calm, loved, and smiled at. You are my favorite person.',
-    replay: 'Replay this surprise',
+    replay: 'see what i made',
   },
 } as const

@@ -1,5 +1,4 @@
-import { useEffect, useState } from 'react'
-import { motion } from 'framer-motion'
+import { useState } from 'react'
 import type { MemoryItem } from '../data/memories'
 import type { ScrapbookInstance } from '../utils/scrapbook'
 
@@ -34,12 +33,6 @@ const FLOWERS = [
 
 export function MemoryStack({ heading, hint, instances, onOpenLetter }: MemoryStackProps) {
   const [opened, setOpened] = useState(false)
-  const [ready, setReady] = useState(false)
-
-  useEffect(() => {
-    const t = window.setTimeout(() => setReady(true), 50)
-    return () => window.clearTimeout(t)
-  }, [])
 
   const handleOpen = () => {
     if (opened) return
@@ -49,11 +42,7 @@ export function MemoryStack({ heading, hint, instances, onOpenLetter }: MemorySt
 
   return (
     <section className="relative h-screen w-full overflow-hidden bg-[#FFF8F2]">
-      {/* ── Photo collage layer ── fade in on mount */}
-      <div
-        className="absolute inset-0"
-        style={{ opacity: ready ? 1 : 0, transition: 'opacity 600ms ease' }}
-      >
+      <div className="absolute inset-0">
         {instances.slice(0, 145).map((instance, index) => {
           const isHighlight = HIGHLIGHT_SET.has(index)
           const hasTape =
@@ -78,39 +67,21 @@ export function MemoryStack({ heading, hint, instances, onOpenLetter }: MemorySt
 
           return (
             <div key={instance.instanceId} className="absolute" style={wrapStyle}>
-              {isHighlight ? (
-                <motion.div
-                  className={`relative ${sizeClass} rounded-xl border border-[#f0e3d4] bg-white p-[6px] shadow-lg`}
-                  style={{
-                    rotate: instance.rotate,
-                    scale: 1.05,
-                    opacity: baseOpacity,
-                    boxShadow: '0 10px 30px rgba(255, 183, 197, 0.4)',
-                  }}
-                  animate={{ scale: [1.05, 1.08, 1.05] }}
-                  transition={{ duration: 4, repeat: Number.POSITIVE_INFINITY, ease: 'easeInOut' }}
-                >
-                  {hasTape && (
-                    <div className="absolute -top-2 left-1/2 h-4 w-10 -translate-x-1/2 rotate-[-3deg] rounded-sm bg-[#f0dcc6]/80" />
-                  )}
-                  <img src={instance.src} alt="" loading="lazy" draggable={false} className="h-20 w-full rounded-lg object-cover sm:h-28" />
-                  <span className="absolute -right-1 -top-1 text-[10px] leading-none">✨</span>
-                </motion.div>
-              ) : (
-                <div
-                  className={`relative ${sizeClass} rounded-xl border border-[#f0e3d4] bg-white p-[6px] shadow-md`}
-                  style={{
-                    opacity: baseOpacity,
-                    filter: baseFilter,
-                    transform: `rotate(${instance.rotate}deg) scale(${instance.scale})`,
-                  }}
-                >
-                  {hasTape && (
-                    <div className="absolute -top-2 left-1/2 h-4 w-10 -translate-x-1/2 rotate-[-3deg] rounded-sm bg-[#f0dcc6]/80" />
-                  )}
-                  <img src={instance.src} alt="" loading="lazy" draggable={false} className="h-20 w-full rounded-lg object-cover sm:h-28" />
-                </div>
-              )}
+              <div
+                className={`relative ${sizeClass} rounded-xl border border-[#f0e3d4] bg-white p-[6px] ${isHighlight ? 'shadow-lg' : 'shadow-md'}`}
+                style={{
+                  opacity: baseOpacity,
+                  filter: baseFilter,
+                  boxShadow: isHighlight ? '0 10px 30px rgba(255, 183, 197, 0.3)' : undefined,
+                  transform: `rotate(${instance.rotate}deg) scale(${isHighlight ? 1.05 : instance.scale})`,
+                }}
+              >
+                {hasTape && (
+                  <div className="absolute -top-2 left-1/2 h-4 w-10 -translate-x-1/2 rotate-[-3deg] rounded-sm bg-[#f0dcc6]/80" />
+                )}
+                <img src={instance.src} alt="" loading="lazy" draggable={false} className="h-20 w-full rounded-lg object-cover sm:h-28" />
+                {isHighlight && <span className="absolute -right-1 -top-1 text-[10px] leading-none">✨</span>}
+              </div>
             </div>
           )
         })}
@@ -145,22 +116,13 @@ export function MemoryStack({ heading, hint, instances, onOpenLetter }: MemorySt
         </div>
       ))}
 
-      {/* ── Cake sticker — single motion element, gentle bounce ── */}
-      <motion.span
-        className="pointer-events-none absolute bottom-10 right-12 text-4xl"
-        style={{ zIndex: 97 }}
-        animate={{ y: [0, -4, 0] }}
-        transition={{ duration: 3, repeat: Number.POSITIVE_INFINITY, ease: 'easeInOut' }}
-      >
+      <span className="pointer-events-none absolute bottom-10 right-12 text-4xl" style={{ zIndex: 97 }}>
         🎂
-      </motion.span>
+      </span>
 
-      {/* ── Warm dim overlay — fades in when letter opened ── */}
-      <motion.div
+      <div
         className="pointer-events-none absolute inset-0 bg-[#f0e6dc]"
-        style={{ zIndex: 100 }}
-        animate={{ opacity: opened ? 0.5 : 0 }}
-        transition={{ duration: 0.45 }}
+        style={{ zIndex: 100, opacity: opened ? 0.5 : 0, transition: 'opacity 220ms ease-out' }}
       />
 
       {/* ── Top heading text ── */}
@@ -171,21 +133,10 @@ export function MemoryStack({ heading, hint, instances, onOpenLetter }: MemorySt
 
       {/* ── Center letter card — sole focal animation ── */}
       <div className="absolute inset-0 z-[115] flex items-center justify-center px-5">
-        <motion.div
-          initial={{ scale: 0.94, opacity: 0, rotate: -1, y: 10 }}
-          animate={
-            opened
-              ? { scale: [1, 1.06, 0.9], opacity: [1, 1, 0], y: [0, -8, -32], rotate: -1 }
-              : { scale: 1, opacity: 1, y: 0, rotate: -1 }
-          }
-          transition={
-            opened
-              ? { duration: 0.55, ease: 'easeInOut', times: [0, 0.3, 1] }
-              : { duration: 0.5, ease: 'easeInOut' }
-          }
-          whileTap={!opened ? { scale: 1.04 } : {}}
+        <div
           onClick={handleOpen}
-          className="w-full max-w-xs cursor-pointer select-none rounded-2xl border border-[#e4cfb7] bg-[#fff3e8] px-8 py-9 text-center shadow-[0_24px_60px_-28px_rgba(84,62,52,0.6)] sm:max-w-sm"
+          className={`w-full max-w-xs cursor-pointer select-none rounded-2xl border border-[#e4cfb7] bg-[#fff3e8] px-8 py-9 text-center shadow-[0_24px_60px_-28px_rgba(84,62,52,0.6)] transition-all duration-300 sm:max-w-sm ${opened ? 'translate-y-[-16px] scale-95 opacity-0' : 'scale-100 opacity-100 active:scale-[1.02]'}`}
+          style={{ rotate: '-1deg' }}
         >
           <p className="font-hand text-4xl leading-snug text-[#5e4a40] sm:text-5xl">
             soft little moments
@@ -193,10 +144,10 @@ export function MemoryStack({ heading, hint, instances, onOpenLetter }: MemorySt
             that mean everything to me
           </p>
           <p className="mt-5 text-sm font-semibold tracking-wide text-[#9f8578]">
-            September 2024 🌸
+            23 April 2001 🌸
           </p>
           <p className="mt-4 text-xs tracking-widest text-[#b09b90]">tap anywhere ↓</p>
-        </motion.div>
+        </div>
       </div>
     </section>
   )

@@ -1,5 +1,3 @@
-import { motion } from 'framer-motion'
-import { fadeUp, popIn, staggerContainer } from '../utils/animation'
 import { memories } from '../data/memories'
 
 type LoveLetterProps = {
@@ -12,13 +10,7 @@ type LoveLetterProps = {
 
 export function LoveLetter({ heading, paragraphs, signature, cta, onNext }: LoveLetterProps) {
   return (
-    <motion.section
-      className="relative mx-auto max-w-2xl"
-      initial="hidden"
-      whileInView="visible"
-      viewport={{ once: true, amount: 0.2 }}
-      variants={staggerContainer}
-    >
+    <section className="relative mx-auto max-w-2xl">
       {/* Notebook paper — ruled lines via CSS background */}
       <div
         className="relative rounded-[1.6rem] p-8 sm:p-12"
@@ -56,41 +48,30 @@ export function LoveLetter({ heading, paragraphs, signature, cta, onNext }: Love
         </div>
 
         <div className="ml-8 sm:ml-10">
-          <motion.h2
-            variants={fadeUp}
-            className="text-4xl text-[#5b4b45] sm:text-5xl"
-            style={{ fontFamily: 'var(--font-hand2)' }}
-          >
+          <h2 className="text-4xl text-[#5b4b45] sm:text-5xl" style={{ fontFamily: 'var(--font-hand2)' }}>
             {heading}
-          </motion.h2>
+          </h2>
 
           <div className="mt-6 space-y-4 text-left text-base leading-loose text-[#6b5b53] sm:text-lg">
             {paragraphs.map((line) => (
-              <motion.p key={line} variants={fadeUp}>
+              <p key={line}>
                 {line}
-              </motion.p>
+              </p>
             ))}
           </div>
 
-          <motion.p
-            variants={fadeUp}
-            className="mt-8 whitespace-pre-line text-[#8b5f58] sm:text-xl"
-            style={{ fontFamily: 'var(--font-hand)', fontSize: '1.4rem' }}
-          >
+          <p className="mt-8 whitespace-pre-line text-[#8b5f58] sm:text-xl" style={{ fontFamily: 'var(--font-hand)', fontSize: '1.4rem' }}>
             {signature}
-          </motion.p>
+          </p>
 
-          <motion.button
-            variants={popIn}
-            whileHover={{ y: -2 }}
-            whileTap={{ scale: 0.96 }}
+          <button
             onClick={onNext}
-            className="mt-8 rounded-full bg-[#b7c9a8] px-6 py-3 font-semibold text-[#3f3a36]"
+            className="mt-8 rounded-full bg-[#b7c9a8] px-6 py-3 font-semibold text-[#3f3a36] transition-transform hover:-translate-y-0.5 active:scale-95"
           >
             {cta}
-          </motion.button>
+          </button>
         </div>
       </div>
-    </motion.section>
+    </section>
   )
 }
