@@ -1,0 +1,49 @@
+@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Indie+Flower&family=Nunito:wght@400;600;700;800&display=swap');
+@import 'tailwindcss';
+
+@theme {
+  --font-sans: 'Nunito', ui-sans-serif, system-ui, sans-serif;
+  --font-hand: 'Caveat', cursive;
+  --font-hand2: 'Indie Flower', cursive;
+}
+
+:root {
+  color: #5b4b45;
+  background: #fffaf5;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  min-height: 100%;
+  font-family: var(--font-sans);
+}
+
+body {
+  background-image:
+    radial-gradient(circle at 18% 18%, rgba(249, 215, 218, 0.3), transparent 32%),
+    radial-gradient(circle at 80% 2%, rgba(183, 201, 168, 0.2), transparent 30%),
+    radial-gradient(circle at 50% 88%, rgba(246, 199, 182, 0.18), transparent 31%),
+    repeating-linear-gradient(
+      -12deg,
+      rgba(176, 139, 98, 0.045) 0,
+      rgba(176, 139, 98, 0.045) 1px,
+      transparent 1px,
+      transparent 11px
+    ),
+    linear-gradient(to bottom, #fffaf5, #fffcf8);
+}
+
+button {
+  cursor: pointer;
+  font: inherit;
+}
