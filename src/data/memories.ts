@@ -1,5 +1,3 @@
-import { generateScrapbookInstances, type MemoryPhoto } from '../utils/scrapbook'
-
 export type MemoryItem = {
   id: string
   image: string
@@ -49,35 +47,8 @@ export const memories: MemoryItem[] = [
   { id: 'm-037', image: '/images/photo-37.webp', title: 'end of year, full heart', caption: 'This year gave me you, and that is everything.', date: 'Dec 2025' },
   { id: 'm-038', image: '/images/photo-38.webp', title: 'a new year begins', caption: 'Starting this year right — with you.', date: 'Jan 2026' },
   { id: 'm-039', image: '/images/photo-39.webp', title: 'january sunshine', caption: 'Even January feels warm when you are smiling.', note: 'love this', date: 'Jan 2026' },
-  { id: 'm-040', image: '/images/photo-40.webp', title: 'staying in, loving it', caption: 'The best plans are the ones with you in them.', date: 'Jan 2026' },
-  { id: 'm-041', image: '/images/photo-41.webp', title: 'last days of january', caption: 'I want to hold every moment of this month.', date: 'Jan 2026' },
-  { id: 'm-042', image: '/images/photo-42.webp', title: 'quiet january evening', caption: 'Some evenings are just perfect.', date: 'Jan 2026' },
-  { id: 'm-043', image: '/images/photo-43.webp', title: 'end of a good month', caption: 'January was kind to us.', note: 'grateful', date: 'Jan 2026' },
-  { id: 'm-044', image: '/images/photo-44.webp', title: 'into february', caption: 'The month of love — but every month is with you.', date: 'Jan 2026' },
-  { id: 'm-045', image: '/images/photo-45.webp', title: 'february soft', caption: 'February feels like a long love letter.', date: 'Feb 2026' },
-  { id: 'm-046', image: '/images/photo-46.webp', title: 'valentine energy 💕', caption: 'You are my everyday valentine.', note: 'always', date: 'Feb 2026' },
-  { id: 'm-047', image: '/images/photo-47.webp', title: 'february ending', caption: 'Short month, long memory.', date: 'Feb 2026' },
-  { id: 'm-048', image: '/images/photo-48.webp', title: 'march arrives', caption: 'A new month, the same love — growing bigger.', date: 'Mar 2026' },
-  { id: 'm-049', image: '/images/photo-49.webp', title: 'spring feeling', caption: 'Something about spring feels just like you — blooming.', note: 'my spring', date: 'Mar 2026' },
-  { id: 'm-050', image: '/images/photo-50.webp', title: 'april, finally', caption: 'We made it to your month. Happy birthday month, love.', date: 'Apr 2026' },
-  { id: 'm-051', image: '/images/photo-51.webp', title: 'almost your birthday', caption: 'Getting closer to the best day of the year — yours.', note: 'counting down', date: 'Apr 2026' },
-  { id: 'm-052', image: '/images/photo-52.webp', title: 'happy birthday, my love 🌸', caption: 'Today is all about you. I am so glad you were born.', note: 'forever my favorite', date: 'Apr 23, 2026' },
-  { id: 'm-053', image: '/images/photo-53.webp', title: 'this one is my favorite', caption: 'You are my favorite everything.', note: '💛', date: 'Apr 23, 2026' },
+  { id: 'm-040', image: '/images/photo-40.webp', title: 'happy birthday, my love 🌸', caption: 'Today is all about you. I am so glad you were born.', note: 'forever my favorite', date: 'Apr 23, 2026' },
 ].map((item) => ({
   ...item,
   date: '23 April 2001',
 }))
-
-export const memoryPhotos: MemoryPhoto[] = memories.map((item) => ({
-  id: item.id,
-  src: item.image,
-  title: item.title,
-  caption: item.caption,
-  note: item.note,
-  date: item.date,
-}))
-
-export const scrapbookInstances = generateScrapbookInstances(memoryPhotos, {
-  totalInstances: 200,
-  seed: 'birthday-scrapbook-2026',
-})

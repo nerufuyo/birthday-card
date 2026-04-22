@@ -6,9 +6,12 @@ import { MemoryStack } from './components/MemoryStack'
 import { PhotoCarousel } from './components/PhotoCarousel'
 import { audioContent } from './data/audio'
 import { content } from './data/content'
-import { memories, scrapbookInstances } from './data/memories'
+import { memories } from './data/memories'
 
 const carouselImages = memories.map((m) => m.image)
+
+// Only preload the first N images before showing the page — the rest lazy-load
+const INITIAL_BATCH = 8
 
 function App() {
   const [unlockedStep, setUnlockedStep] = useState(0)
@@ -17,6 +20,7 @@ function App() {
   const [loadingPercent, setLoadingPercent] = useState(0)
   const sectionRefs = useRef<Array<HTMLElement | null>>([])
   const musicStartedRef = useRef(false)
+  const audioRef = useRef<HTMLAudioElement | null>(null)
 
   const revealStep = (step: number) => {
     setUnlockedStep((value) => Math.max(value, step))
@@ -35,59 +39,104 @@ function App() {
     setShowCarousel(true)
   }
 
+  // ── Preload initial batch of images + audio, then show page ──
   useEffect(() => {
     let cancelled = false
 
-    const imageSources = Array.from(new Set(memories.map((memory) => memory.image)))
-    const totalAssets = imageSources.length + 1
-    let loadedAssets = 0
+    const imageSources = Array.from(new Set(memories.map((m) => m.image)))
+    const initialSources = imageSources.slice(0, INITIAL_BATCH)
+    const totalInitial = initialSources.length + 1 // +1 for audio
+    let loadedCount = 0
 
-    const markLoaded = () => {
+    const tick = () => {
       if (cancelled) return
+      loadedCount += 1
+      setLoadingPercent(Math.round((loadedCount / totalInitial) * 100))
 
-      loadedAssets += 1
-      const nextPercent = Math.round((loadedAssets / totalAssets) * 100)
-      setLoadingPercent(nextPercent)
-
-      if (loadedAssets >= totalAssets) {
+      if (loadedCount >= totalInitial) {
+        // Small delay so the bar visually hits 100% before fading
         setTimeout(() => {
           if (!cancelled) setAssetsReady(true)
-        }, 120)
+        }, 80)
       }
     }
 
-    for (const src of imageSources) {
-      const image = new Image()
-      image.decoding = 'async'
-      image.onload = markLoaded
-      image.onerror = markLoaded
-      image.src = src
+    // Preload first batch of images
+    for (const src of initialSources) {
+      const img = new Image()
+      img.decoding = 'async'
+      img.onload = tick
+      img.onerror = tick
+      img.src = src
     }
 
-    const audio = document.createElement('audio')
+    // Preload audio (reuse same element for playback later)
+    const audio = new Audio()
     audio.preload = 'auto'
     audio.src = audioContent.source
-    audio.oncanplaythrough = markLoaded
-    audio.onerror = markLoaded
+    audio.oncanplaythrough = () => {
+      audio.oncanplaythrough = null
+      tick()
+    }
+    audio.onerror = () => {
+      audio.onerror = null
+      tick()
+    }
     audio.load()
+    audioRef.current = audio
+
+    // ── Progressively preload the rest in small batches (after page shown) ──
+    const remainingSources = imageSources.slice(INITIAL_BATCH)
+    let batchIndex = 0
+    const BATCH_SIZE = 4
+
+    const preloadNextBatch = () => {
+      if (cancelled || batchIndex >= remainingSources.length) return
+
+      const batch = remainingSources.slice(batchIndex, batchIndex + BATCH_SIZE)
+      batchIndex += BATCH_SIZE
+      let done = 0
+
+      for (const src of batch) {
+        const img = new Image()
+        img.decoding = 'async'
+        img.onload = img.onerror = () => {
+          done += 1
+          if (done >= batch.length) {
+            // Wait a frame before starting next batch to avoid blocking the main thread
+            requestAnimationFrame(() => preloadNextBatch())
+          }
+        }
+        img.src = src
+      }
+    }
+
+    // Start background preloading once the initial batch is ready
+    const checkAndStart = setInterval(() => {
+      if (loadedCount >= totalInitial || cancelled) {
+        clearInterval(checkAndStart)
+        if (!cancelled) preloadNextBatch()
+      }
+    }, 200)
 
     return () => {
       cancelled = true
-      audio.oncanplaythrough = null
-      audio.onerror = null
+      clearInterval(checkAndStart)
     }
   }, [])
 
-  // Silent music: starts on first user interaction, no visible button
+  // ── Music: start on first user interaction, share the pre-loaded audio element ──
   useEffect(() => {
-    const audio = new Audio(audioContent.source)
-    audio.loop = true
-    audio.volume = 0.45
-
     const startMusic = () => {
       if (musicStartedRef.current) return
       musicStartedRef.current = true
-      audio.play().catch(() => { })
+
+      const audio = audioRef.current
+      if (audio) {
+        audio.loop = true
+        audio.volume = 0.45
+        audio.play().catch(() => { })
+      }
       window.removeEventListener('pointerdown', startMusic)
       window.removeEventListener('touchstart', startMusic)
       window.removeEventListener('keydown', startMusic)
@@ -101,7 +150,7 @@ function App() {
       window.removeEventListener('pointerdown', startMusic)
       window.removeEventListener('touchstart', startMusic)
       window.removeEventListener('keydown', startMusic)
-      audio.pause()
+      audioRef.current?.pause()
     }
   }, [])
 
@@ -144,7 +193,6 @@ function App() {
           heading={content.memoryStack.heading}
           hint={content.memoryStack.hint}
           items={memories}
-          instances={scrapbookInstances}
           onOpenLetter={() => revealStep(1)}
         />
       </section>

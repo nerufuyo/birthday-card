@@ -78,12 +78,23 @@ export function PhotoCarousel({ images, onClose }: PhotoCarouselProps) {
         else if (delta < -45) handleNext()
     }
 
+    // Preload the next 2 images via JS (no extra DOM nodes needed)
+    useEffect(() => {
+        const next1 = (index + 1) % total
+        const next2 = (index + 2) % total
+        const img1 = new Image()
+        img1.src = images[next1]
+        const img2 = new Image()
+        img2.src = images[next2]
+    }, [index, images, total])
+
     return (
         <div
             className="fixed inset-0 z-50 flex flex-col bg-[#1a1410]"
             style={{
                 paddingTop: 'max(3rem, env(safe-area-inset-top))',
                 paddingBottom: 'max(4.5rem, env(safe-area-inset-bottom))',
+                contain: 'layout style paint',
             }}
             onTouchStart={onTouchStart}
             onTouchEnd={onTouchEnd}
@@ -125,17 +136,6 @@ export function PhotoCarousel({ images, onClose }: PhotoCarouselProps) {
                         transition: `opacity ${FADE_MS}ms ease, transform ${FADE_MS}ms ease`,
                         willChange: 'opacity, transform',
                     }}
-                />
-
-                {/* preload next */}
-                <img
-                    src={images[(index + 1) % total]}
-                    alt=""
-                    aria-hidden="true"
-                    loading="eager"
-                    decoding="async"
-                    className="pointer-events-none absolute opacity-0"
-                    style={{ width: 1, height: 1 }}
                 />
             </div>
 
