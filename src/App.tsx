@@ -87,7 +87,7 @@ function App() {
     const startMusic = () => {
       if (musicStartedRef.current) return
       musicStartedRef.current = true
-      audio.play().catch(() => {})
+      audio.play().catch(() => { })
       window.removeEventListener('pointerdown', startMusic)
       window.removeEventListener('touchstart', startMusic)
       window.removeEventListener('keydown', startMusic)
