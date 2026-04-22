@@ -43,7 +43,7 @@ export function MemoryStack({ heading, hint, instances, onOpenLetter }: MemorySt
   return (
     <section className="relative h-screen w-full overflow-hidden bg-[#FFF8F2]">
       <div className="absolute inset-0">
-        {instances.slice(0, 145).map((instance, index) => {
+        {instances.slice(0, 80).map((instance, index) => {
           const isHighlight = HIGHLIGHT_SET.has(index)
           const hasTape =
             index % 6 === 0 && instance.variant !== 'faded' && instance.variant !== 'mini'

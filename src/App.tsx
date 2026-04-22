@@ -3,7 +3,6 @@ import { FinalSection } from './components/FinalSection'
 import { FloatingNatureDecor } from './components/FloatingNatureDecor'
 import { LoveLetter } from './components/LoveLetter'
 import { MemoryStack } from './components/MemoryStack'
-import { MusicToggle } from './components/MusicToggle'
 import { PhotoCarousel } from './components/PhotoCarousel'
 import { audioContent } from './data/audio'
 import { content } from './data/content'
@@ -13,19 +12,11 @@ const carouselImages = memories.map((m) => m.image)
 
 function App() {
   const [unlockedStep, setUnlockedStep] = useState(0)
-  const [musicAutoStartToken, setMusicAutoStartToken] = useState(0)
   const [showCarousel, setShowCarousel] = useState(false)
   const [assetsReady, setAssetsReady] = useState(false)
   const [loadingPercent, setLoadingPercent] = useState(0)
-  const hasAutoStartedMusicRef = useRef(false)
   const sectionRefs = useRef<Array<HTMLElement | null>>([])
-
-  const triggerMusicStart = () => {
-    if (hasAutoStartedMusicRef.current) return
-
-    hasAutoStartedMusicRef.current = true
-    setMusicAutoStartToken((value) => value + 1)
-  }
+  const musicStartedRef = useRef(false)
 
   const revealStep = (step: number) => {
     setUnlockedStep((value) => Math.max(value, step))
@@ -87,28 +78,32 @@ function App() {
     }
   }, [])
 
+  // Silent music: starts on first user interaction, no visible button
   useEffect(() => {
-    if (!assetsReady) return
+    const audio = new Audio(audioContent.source)
+    audio.loop = true
+    audio.volume = 0.45
 
-    const onFirstInteraction = () => {
-      triggerMusicStart()
-      detach()
+    const startMusic = () => {
+      if (musicStartedRef.current) return
+      musicStartedRef.current = true
+      audio.play().catch(() => {})
+      window.removeEventListener('pointerdown', startMusic)
+      window.removeEventListener('touchstart', startMusic)
+      window.removeEventListener('keydown', startMusic)
     }
 
-    const detach = () => {
-      window.removeEventListener('pointerdown', onFirstInteraction)
-      window.removeEventListener('keydown', onFirstInteraction)
-      window.removeEventListener('touchstart', onFirstInteraction)
-      window.removeEventListener('wheel', onFirstInteraction)
+    window.addEventListener('pointerdown', startMusic, { passive: true })
+    window.addEventListener('touchstart', startMusic, { passive: true })
+    window.addEventListener('keydown', startMusic)
+
+    return () => {
+      window.removeEventListener('pointerdown', startMusic)
+      window.removeEventListener('touchstart', startMusic)
+      window.removeEventListener('keydown', startMusic)
+      audio.pause()
     }
-
-    window.addEventListener('pointerdown', onFirstInteraction, { passive: true })
-    window.addEventListener('keydown', onFirstInteraction)
-    window.addEventListener('touchstart', onFirstInteraction, { passive: true })
-    window.addEventListener('wheel', onFirstInteraction, { passive: true })
-
-    return detach
-  }, [assetsReady])
+  }, [])
 
   if (!assetsReady) {
     return (
@@ -130,21 +125,19 @@ function App() {
     )
   }
 
+  // Carousel rendered in isolation — no scrapbook visible behind it
+  if (showCarousel) {
+    return (
+      <PhotoCarousel
+        images={carouselImages}
+        onClose={() => setShowCarousel(false)}
+      />
+    )
+  }
+
   return (
     <main className="relative min-h-screen overflow-x-hidden bg-[#fffaf5]">
-      {showCarousel && (
-        <PhotoCarousel
-          images={carouselImages}
-          onClose={() => setShowCarousel(false)}
-        />
-      )}
       <FloatingNatureDecor />
-      <MusicToggle
-        src={audioContent.source}
-        label={audioContent.label}
-        helperText={audioContent.helperText}
-        autoStartToken={musicAutoStartToken}
-      />
 
       <section ref={(el) => { sectionRefs.current[0] = el }}>
         <MemoryStack
@@ -152,10 +145,7 @@ function App() {
           hint={content.memoryStack.hint}
           items={memories}
           instances={scrapbookInstances}
-          onOpenLetter={() => {
-            triggerMusicStart()
-            revealStep(1)
-          }}
+          onOpenLetter={() => revealStep(1)}
         />
       </section>
 
