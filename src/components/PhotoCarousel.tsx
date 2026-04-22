@@ -1,15 +1,16 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { TouchEvent } from 'react'
+import type { MemoryItem } from '../data/memories'
 
 type PhotoCarouselProps = {
-    images: string[]
+    items: MemoryItem[]
     onClose: () => void
 }
 
 const INTERVAL_MS = 4000
 const FADE_MS = 300
 
-export function PhotoCarousel({ images, onClose }: PhotoCarouselProps) {
+export function PhotoCarousel({ items, onClose }: PhotoCarouselProps) {
     const [index, setIndex] = useState(0)
     const [visible, setVisible] = useState(true)
     const [imgLoaded, setImgLoaded] = useState(false)
@@ -17,7 +18,7 @@ export function PhotoCarousel({ images, onClose }: PhotoCarouselProps) {
     const fadingRef = useRef(false)
     const indexRef = useRef(0)
     const touchStartXRef = useRef<number | null>(null)
-    const total = images.length
+    const total = items.length
 
     const goToIndex = useCallback(
         (next: number) => {
@@ -83,10 +84,12 @@ export function PhotoCarousel({ images, onClose }: PhotoCarouselProps) {
         const next1 = (index + 1) % total
         const next2 = (index + 2) % total
         const img1 = new Image()
-        img1.src = images[next1]
+        img1.src = items[next1].image
         const img2 = new Image()
-        img2.src = images[next2]
-    }, [index, images, total])
+        img2.src = items[next2].image
+    }, [index, items, total])
+
+    const currentItem = items[index]
 
     return (
         <div
@@ -124,8 +127,8 @@ export function PhotoCarousel({ images, onClose }: PhotoCarouselProps) {
 
                 <img
                     key={index}
-                    src={images[index]}
-                    alt={`memory ${index + 1}`}
+                    src={currentItem.image}
+                    alt={currentItem.title}
                     loading="eager"
                     decoding="async"
                     onLoad={() => setImgLoaded(true)}
@@ -137,6 +140,27 @@ export function PhotoCarousel({ images, onClose }: PhotoCarouselProps) {
                         willChange: 'opacity, transform',
                     }}
                 />
+
+                {/* ── Cute yellow caption overlaid at bottom of image area ── */}
+                <div
+                    className="absolute inset-x-0 bottom-0 px-4 pb-3 text-center"
+                    style={{
+                        opacity: visible && imgLoaded ? 1 : 0,
+                        transform: visible && imgLoaded ? 'translateY(0)' : 'translateY(8px)',
+                        transition: `opacity ${FADE_MS}ms ease 50ms, transform ${FADE_MS}ms ease 50ms`,
+                        background: 'linear-gradient(to top, rgba(26,20,16,0.85) 0%, rgba(26,20,16,0.4) 60%, transparent 100%)',
+                    }}
+                >
+                    <p
+                        className="font-hand text-2xl sm:text-3xl"
+                        style={{ color: '#fcd34d', textShadow: '0 1px 6px rgba(0,0,0,0.5)' }}
+                    >
+                        {currentItem.caption}
+                    </p>
+                    <p className="mt-1 text-xs text-white/50">
+                        {currentItem.title}
+                    </p>
+                </div>
             </div>
 
             {/* bottom controls */}

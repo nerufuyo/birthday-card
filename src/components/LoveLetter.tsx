@@ -43,7 +43,7 @@ export function LoveLetter({ heading, paragraphs, signature, cta, onNext }: Love
               alt="our memory"
               className="h-16 w-full rounded-md object-cover"
             />
-            <p className="mt-1 text-center font-['Caveat'] text-[9px] text-[#9f8578]">you + me ♡</p>
+            <p className="mt-1 text-center font-['Caveat'] text-[9px] text-[#9f8578]">sugarplum + cupcake ♡</p>
           </div>
         </div>
 

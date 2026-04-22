@@ -8,10 +8,8 @@ import { audioContent } from './data/audio'
 import { content } from './data/content'
 import { memories } from './data/memories'
 
-const carouselImages = memories.map((m) => m.image)
-
 // Only preload the first N images before showing the page — the rest lazy-load
-const INITIAL_BATCH = 8
+const INITIAL_BATCH = 6
 
 function App() {
   const [unlockedStep, setUnlockedStep] = useState(0)
@@ -178,7 +176,7 @@ function App() {
   if (showCarousel) {
     return (
       <PhotoCarousel
-        images={carouselImages}
+        items={memories}
         onClose={() => setShowCarousel(false)}
       />
     )

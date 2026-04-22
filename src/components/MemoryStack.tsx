@@ -8,11 +8,11 @@ type MemoryStackProps = {
   onOpenLetter: () => void
 }
 
-// Sticky notes scattered around the scene
+// Sticky notes with Sugarplum & Cupcake nicknames
 const STICKY_NOTES = [
-  { text: 'you make every day brighter 💛', style: { left: '3%', top: '18%' } as React.CSSProperties, rotate: '-2deg' },
-  { text: 'my favorite person 💛', style: { left: '5%', bottom: '12%' } as React.CSSProperties, rotate: '1.5deg' },
-  { text: 'so many little moments with you 💗', style: { right: '3%', top: '14%' } as React.CSSProperties, rotate: '-1deg' },
+  { text: 'sugarplum loves cupcake 💛', style: { left: '3%', top: '18%' } as React.CSSProperties, rotate: '-2deg' },
+  { text: 'cupcake is sugarplum\'s fav 🍰', style: { left: '5%', bottom: '12%' } as React.CSSProperties, rotate: '1.5deg' },
+  { text: 'sugarplum🍭 × cupcake🍰 💗', style: { right: '3%', top: '14%' } as React.CSSProperties, rotate: '-1deg' },
   { text: 'forever & always 💛', style: { right: '4%', bottom: '14%' } as React.CSSProperties, rotate: '2deg' },
 ]
 
@@ -67,7 +67,7 @@ export function MemoryStack({ heading, hint, items, onOpenLetter }: MemoryStackP
               <img
                 src={item.image}
                 alt=""
-                loading="eager"
+                loading="lazy"
                 decoding="async"
                 draggable={false}
                 className="h-full w-full rounded-[5px] object-cover"
@@ -90,7 +90,7 @@ export function MemoryStack({ heading, hint, items, onOpenLetter }: MemoryStackP
       {STICKY_NOTES.map((note) => (
         <div
           key={note.text}
-          className="pointer-events-none absolute max-w-[110px] rounded-lg bg-white/90 px-3 py-2 text-xs shadow-sm"
+          className="pointer-events-none absolute max-w-[120px] rounded-lg bg-white/90 px-3 py-2 text-xs shadow-sm"
           style={{
             ...note.style,
             zIndex: 96,
@@ -126,11 +126,12 @@ export function MemoryStack({ heading, hint, items, onOpenLetter }: MemoryStackP
           <p className="font-hand text-4xl leading-snug text-[#5e4a40] sm:text-5xl">
             soft little moments
             <br />
-            that mean everything to me
+            that mean everything
           </p>
           <p className="mt-5 text-sm font-semibold tracking-wide text-[#9f8578]">
-            23 April 2001 🌸
+            sugarplum🍭 × cupcake🍰
           </p>
+          <p className="mt-1 text-xs text-[#b09b90]">23 April 2001 🌸</p>
           <p className="mt-4 text-xs tracking-widest text-[#b09b90]">tap anywhere ↓</p>
         </div>
       </div>
